@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Sneaker Details</h1>
+
+<div class="card">
+  <div class="card-content">
+    <span class="card-title">{{ shoe.name }}</span>
+    <p>Brand: {{ shoe.brand }}</p>
+    <p>Description: {{ shoe.description }}</p>
+    {% if shoe.year > 0 %}
+      <p>Release: {{ shoe.year }}</p>
+    {% else %}
+      <p>Age: Kitten</p>
+    {% endif %}
+  </div>
+  <div class="card-action">
+    <a href="{% url 'shoes_update' shoe.id %}">Edit</a>
+    <a href="{% url 'shoes_delete' shoe.id %}">Delete</a>
+  </div>
+  
+</div>
+
+{% endblock %}
