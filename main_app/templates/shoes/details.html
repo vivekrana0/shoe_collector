@@ -2,23 +2,104 @@
 {% block content %}
 
 <h1>Sneaker Details</h1>
-
-<div class="card">
-  <div class="card-content">
-    <span class="card-title">{{ shoe.name }}</span>
-    <p>Brand: {{ shoe.brand }}</p>
-    <p>Description: {{ shoe.description }}</p>
-    {% if shoe.year > 0 %}
-      <p>Release: {{ shoe.year }}</p>
+<div class="row">
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ shoe.name }}</span>
+        <p>Brand: {{ shoe.brand }}</p>
+        <p>Description: {{ shoe.description }}</p>
+       {% if shoe.year > 0 %}
+          <p>Release: {{ shoe.year }}</p>
+      {% else %}
+         <p>Age: 0</p>
+       {% endif %}
+      </div>
+    <div class="card-action">
+        <a href="{% url 'shoes_update' shoe.id %}">Edit</a>
+       <a href="{% url 'shoes_delete' shoe.id %}">Delete</a>
+      </div>
+    </div>
+  </div>
+  <div class="col s6">
+    <form action="{% url 'add_reason' shoe.id %}" method="POST" >
+      {% csrf_token %}
+      {{ reason_form.as_p }}
+      <input type="submit" class="btn" value="Add Purpose">
+    </form>
+    <table class="striped">
+      <thead>
+        <tr><th>Date</th><th>Purposes</th></tr>
+      </thead>
+      <tbody>
+        {% for reason in shoe.reason_set.all %}
+          <tr>
+            <td>{{reason.date}}</td>
+            <td>{{reason.get_occasion_display}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<hr>
+<div class="row">
+  <div class="col s6">
+    <h3> Pair {{ shoe.name }} with </h3>
+    {% if shoe.cloths.count %}
+      {% for cloth in shoe.cloths.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span style="color: {{ cloth.color }}">{{ cloth.color }}</span> {{ cloth.name }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="{% url 'remove_attribute' shoe.id cloth.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
     {% else %}
-      <p>Age: Kitten</p>
+      <h5>No Cloths :(</h5>
     {% endif %}
   </div>
-  <div class="card-action">
-    <a href="{% url 'shoes_update' shoe.id %}">Edit</a>
-    <a href="{% url 'shoes_delete' shoe.id %}">Delete</a>
+  <div class="col s6">
+    <h3>Available Cloths</h3>
+    {% if cloths.count %}
+      {% for cloth in cloths.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span style="color: {{ cloth.color }}">{{ cloth.color }}</span> {{ cloth.name }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="{% url 'add_attribute' shoe.id cloth.id%}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>{{shoe.name}} Already Has All Cloths Available</h5>
+    {% endif %}
   </div>
-  
 </div>
+<script>
+  var dateEl = document.getElementById('id_date');
+  M.Datepicker.init(dateEl, {
+    format: 'yyyy-mm-dd',
+    defaultDate: new Date(),
+    setDefaultDate: true,
+    autoClose: true
+  });
+  var selectEl = document.getElementById('id_occasion');
+  M.FormSelect.init(selectEl);
+</script>
+
 
 {% endblock %}
