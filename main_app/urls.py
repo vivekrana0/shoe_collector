@@ -2,6 +2,7 @@ from unicodedata import name
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
@@ -20,5 +21,7 @@ urlpatterns = [
     path('cloths/<int:pk>/delete', views.ClothDelete.as_view(), name='cloths_delete'),
 
     path('cloths/<int:shoe_id>/<int:cloth_id>/add', views.add_attribute, name='add_attribute'),
-    path('cloths/<int:shoe_id>/<int:cloth_id>/remove', views.remove_attribute, name='remove_attribute')
+    path('cloths/<int:shoe_id>/<int:cloth_id>/remove', views.remove_attribute, name='remove_attribute'),
+
+    path('accounts/sigup/', views.signup, name='signup')
 ]
