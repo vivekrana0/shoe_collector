@@ -31,9 +31,12 @@ def shoes_index(request):
 @login_required 
 def shoe_detail(request, shoe_id):
     shoe = Shoe.objects.get(id=shoe_id)
-    remaining_cloths = Cloth.objects.exclude(id__in = shoe.cloths.all().values_list('id'))
-    reason_form = ReasonForm()
-    return render(request, 'shoes/details.html',{'shoe':shoe, 'reason_form': reason_form, 'cloths': remaining_cloths})
+    if shoe.user == request.user:
+        remaining_cloths = Cloth.objects.exclude(id__in = shoe.cloths.all().values_list('id'))
+        reason_form = ReasonForm()
+        return render(request, 'shoes/details.html',{'shoe':shoe, 'reason_form': reason_form, 'cloths': remaining_cloths})
+    else:
+        return HttpResponse("<h1>Invalid input, 404</h1>")
 
 class ShoeCreate(LoginRequiredMixin, CreateView):
     model = Shoe
@@ -64,7 +67,10 @@ def add_reason(request, shoe_id):
 
 class ClothList(LoginRequiredMixin, ListView):
     model = Cloth
-    # queryset= Cloth.objects.filter(user = request.user)
+
+    def get_queryset(self):
+        return Cloth.objects.filter(user = self.request.user)
+    
 
 class ClothCreate(LoginRequiredMixin, CreateView):
     model = Cloth
@@ -77,6 +83,9 @@ class ClothCreate(LoginRequiredMixin, CreateView):
 
 class ClothDetails(LoginRequiredMixin, DetailView):
     model = Cloth
+
+    def get_queryset(self):
+        return Cloth.objects.filter(user=self.request.user)
 
 class ClothUpdate(LoginRequiredMixin, UpdateView):
     model = Cloth
